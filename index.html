@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sam — Designer Portfolio V2 (normal) (Copy)</title>
+<title>Sam — Designer Portfolio V2 (normal) (Copy) (Copy)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,440;0,9..144,560;1,9..144,440&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -32,10 +32,10 @@
   nav.top{position:sticky; top:env(safe-area-inset-top,0px); z-index:40; background:none; pointer-events:none; margin-bottom:-68px;}   /* no divider line; page content starts at the very top and slides under the nav */
   nav.top .wrap{display:flex; align-items:center; justify-content:space-between; height:68px; position:relative;}
   .wordmark{font-family:var(--serif); font-size:20px; font-style:italic;}
-  .navlinks{pointer-events:auto; display:flex; gap:4px; font-size:14px; color:var(--text-dim); position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--bg-raised); border:none; border-radius:100px; padding:6px;}
+  .navlinks{pointer-events:auto; display:flex; gap:4px; font-size:14px; color:var(--text-dim); position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); background:var(--bg); border:none; box-shadow:none; filter:none; border-radius:100px; padding:6px;}
   .navlinks a{padding:8px 20px; border-radius:100px; transition:background .2s,color .2s,transform .2s; display:flex; align-items:center; justify-content:center; line-height:1;}
   .navlinks a:hover{transform:scale(1.12);}   /* text grows slightly on hover without shifting the other tabs */
-  .navlinks a.active{background:#1052CD; color:#FFFFFF;}
+  .navlinks a.active{background:none; color:var(--text); font-weight:500;}
   .navlinks a:hover:not(.active){color:var(--text);}
 
   /* ROUTES */
@@ -85,7 +85,7 @@
   .work-info{flex:1;}
   .work-info .wtitle{font-family:var(--sans); font-weight:600; letter-spacing:-0.01em; font-size:clamp(26px,4vw,40px);}
   .wdesc{margin-top:14px; max-width:460px; font-size:14px; line-height:1.55; color:var(--text-dim);}
-  .work-thumb{width:min(420px,42vw); aspect-ratio:280/190; height:auto; border-radius:10px;   /* 1.5x the old 280x190, scaling down on narrow screens */ flex:0 0 auto; opacity:1; transition:transform .35s ease;}   /* full colour at all times; hover only scales it */
+  .work-thumb{width:min(820px,48vw); aspect-ratio:280/190; height:auto; border-radius:10px;   /* 1.5x the old 280x190, scaling down on narrow screens */ flex:0 0 auto; opacity:1; transition:transform .35s ease;}   /* full colour at all times; hover only scales it */
   .work-row:hover .work-thumb{transform:scale(1.03); opacity:1;}
   
   
@@ -145,7 +145,7 @@
   .p-section{scroll-margin-top:110px; padding-bottom:90px; opacity:0; transform:translateY(24px); transition:opacity .6s ease, transform .6s ease;}
   .p-section.in{opacity:1; transform:translateY(0);}
   .p-section h2{font-family:var(--sans); font-size:clamp(26px,3.4vw,36px); font-weight:600; letter-spacing:-0.01em;}
-  .p-section p{margin-top:14px; max-width:600px; line-height:1.65; color:#4A4D46;}
+  .p-section p{margin-top:14px; max-width:none; line-height:1.65; color:#4A4D46;}
   .p-visual{margin-top:26px; aspect-ratio:16/9; border-radius:10px;}
   .p-gallery{margin-top:26px; display:grid; grid-template-columns:1fr 1fr; gap:14px;}
   .p-gallery img{width:100%; aspect-ratio:3/2; object-fit:cover; border-radius:10px; display:block;}
@@ -253,9 +253,9 @@
   .work-sheet{position:relative; z-index:5; background:var(--bg); border-radius:36px 36px 0 0; box-shadow:0 -28px calc(70px + 60px * var(--p,0)) rgba(20,20,15,calc(.08 + .12 * var(--p,0))); padding:0 0 40px; transition:transform .34s cubic-bezier(.2,.8,.2,1);}
   .work-sheet .work-list{margin-top:0;}
   #route-home:has(.sheet-bar:hover) .work-sheet{transform:translateY(-12px);}   /* the tab lifts to invite a click */
-  #hero-stage{height:max(600px, calc(100svh - 92px)); transform-origin:50% 100%; transform:scale(calc(1 - .09 * var(--p,0))); opacity:calc(1 - .65 * var(--p,0)); will-change:transform,opacity;}   /* hero recedes as the sheet is pulled over it; leaves the top 92px of the sheet peeking */
+  #hero-stage{height:max(590px, calc(100svh - 108px)); transform-origin:50% 100%; transform:scale(calc(1 - .09 * var(--p,0))); opacity:calc(1 - .65 * var(--p,0)); will-change:transform,opacity;}   /* hero recedes as the sheet is pulled over it; leaves the top 108px of the sheet peeking (tab + the first project's title and image) so it's obvious there's more to scroll or click */
   #hero-stage .hero{padding-top:clamp(120px,14vw,200px); padding-bottom:0;}
-  .sheet-bar{display:flex; flex-direction:column; align-items:center; gap:12px; width:100%; height:92px; padding:14px 0 0; background:none; border:none; cursor:pointer; color:var(--text-dim); font:inherit; -webkit-tap-highlight-color:transparent; outline:none;}
+  .sheet-bar{display:flex; flex-direction:column; align-items:center; justify-content:flex-start; gap:8px; width:100%; height:50px; padding:8px 0 0; background:none; border:none; cursor:pointer; color:var(--text-dim); font:inherit; -webkit-tap-highlight-color:transparent; outline:none;}
   .sheet-grip{width:44px; height:5px; border-radius:3px; background:rgba(20,20,15,.16); transition:background .2s, width .25s;}
   .sheet-label{display:flex; align-items:center; gap:7px; font-family:var(--serif); font-style:italic; font-size:16px; transition:color .2s;}
   .sheet-label svg{width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:2.2; stroke-linecap:round; stroke-linejoin:round; transition:transform .5s cubic-bezier(.2,.8,.2,1);}
@@ -293,6 +293,8 @@
     #lightbox .lb-close:hover{transform:scale(1.12);}
     #lightbox .lb-prev:hover, #lightbox .lb-next:hover{transform:translateY(-50%) scale(1.12);}
   }
+  #card-tip{position:fixed; left:0; top:0; z-index:200; pointer-events:none; padding:6px 10px; border-radius:6px; background:rgba(20,20,15,.2); color:#fff; font:600 11px/1 var(--sans); white-space:nowrap; opacity:0; transition:opacity .08s;}
+  #card-tip.on{opacity:1;}
 </style>
 </head>
 <body>
@@ -830,8 +832,20 @@ function renderHomeWork(){
 
 function renderGrid(){
   document.getElementById('project-grid').innerHTML = projects.map(p => `
-    <a class="card" href="#/project/${p.id}" title="${p.title}" aria-label="${p.title}" ${bg(p,true)}></a>`).join('');
+    <a class="card" href="#/project/${p.id}" data-tip="${p.title}" aria-label="${p.title}" ${bg(p,true)}></a>`).join('');
 }
+
+// instant hover label for the Projects grid (the browser's built-in title tooltip waits ~1s before showing)
+const cardTip=document.createElement('div'); cardTip.id='card-tip'; document.body.appendChild(cardTip);
+document.addEventListener('mousemove',e=>{
+  const c=e.target.closest && e.target.closest('#project-grid .card');
+  if(!c){ cardTip.classList.remove('on'); return; }
+  cardTip.textContent=c.dataset.tip;
+  cardTip.style.transform='translate('+(e.clientX+16)+'px,'+(e.clientY+18)+'px)';
+  cardTip.classList.add('on');
+});
+document.addEventListener('mouseleave',()=>cardTip.classList.remove('on'));
+window.addEventListener('scroll',()=>cardTip.classList.remove('on'),{passive:true});
 
 let observer, revealObserver;
 function renderProject(id){
