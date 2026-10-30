@@ -54,13 +54,13 @@
   .hero p.sub{font-size:clamp(15px,1vw,19px); line-height:1.5; letter-spacing:-0.02em; color:var(--text); margin:0;}
   .hero .btn{justify-content:center; font-size:clamp(17px,1.15vw,23px); padding:.8235em 1.5294em;}   /* same padding-to-text ratio as the footer button (14px 26px at 17px) */
   /* HERO GRID BACKGROUND */
-  .hero-stage::before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(24,26,22,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(24,26,22,.08) 1px,transparent 1px); background-size:32px 32px; background-position:center top; -webkit-mask-image:radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); mask-image:radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%);}
+  .hero-stage::before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(24,26,22,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(24,26,22,.08) 1px,transparent 1px); background-size:32px 32px; background-position:center top; -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%),radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%),radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); -webkit-mask-composite:source-in; mask-composite:intersect;}
   /* CONTACT PAGE: grid + envelope animation in the empty right third */
   #route-contact{position:relative;}
   #route-contact > .wrap{position:relative; z-index:1;}
   .contact-viz{display:none; position:absolute; top:0; right:0; bottom:0; width:38.333%; pointer-events:none; z-index:0;}
   .contact-viz .cv-stick{position:sticky; top:0; height:100svh; max-height:100%; overflow:hidden;}
-  .contact-viz .cv-stick::before{content:""; position:absolute; inset:0; background-image:linear-gradient(rgba(24,26,22,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(24,26,22,.08) 1px,transparent 1px); background-size:32px 32px; background-position:center top; -webkit-mask-image:radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); mask-image:radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%);}
+  .contact-viz .cv-stick::before{content:""; position:absolute; inset:0; background-image:linear-gradient(rgba(24,26,22,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(24,26,22,.08) 1px,transparent 1px); background-size:32px 32px; background-position:center top; -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%),radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%),radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); -webkit-mask-composite:source-in; mask-composite:intersect;}
   .contact-viz .hero-env{--ew:min(18vw,40svh); top:50%; bottom:auto; left:calc(50% + var(--ew)*.0297); transform:translate(-50%,-50%);}
   @media (min-width:1000px){ .contact-viz{display:block;} }
   /* HERO ENVELOPE: flipbook of the open-envelope frames, anchored to the envelope body */
@@ -173,6 +173,7 @@
   .p-gallery img:hover{transform:scale(1.015);}
   /* PLAY: floating, draggable objects that open into a thin overlay card */
   #play-stage{position:relative; height:clamp(460px,64vh,680px); margin-top:30px; border-top:1px solid var(--line); overflow:hidden;}
+  #play-stage::before{content:""; position:absolute; inset:0; z-index:0; pointer-events:none; background-image:linear-gradient(rgba(24,26,22,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(24,26,22,.08) 1px,transparent 1px); background-size:32px 32px; background-position:center top; -webkit-mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%),radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); mask-image:linear-gradient(180deg,transparent 0%,#000 24%,#000 76%,transparent 100%),radial-gradient(ellipse 62% 78% at 50% 48%,#000 25%,transparent 100%); -webkit-mask-composite:source-in; mask-composite:intersect;}
   #play-layer{position:absolute; inset:0; z-index:2; pointer-events:none;}
   .po{position:absolute; left:0; top:0; pointer-events:auto; touch-action:none; cursor:grab; user-select:none; -webkit-user-select:none; will-change:transform; outline:none;}
   .po.drag{cursor:grabbing; z-index:5;}
@@ -1017,8 +1018,10 @@ function grab(e,s){
     s.vx+=((nx-s.x)/dt-s.vx)*.4; s.vy+=((ny-s.y)/dt-s.vy)*.4; s.x=nx; s.y=ny; s.pt=n;
     s.moved=Math.max(s.moved,Math.hypot(ev.clientX-s.sx,ev.clientY-s.sy));
   };
+  let done=false;
   const up=()=>{
-    s.el.removeEventListener('pointermove',mv); s.el.removeEventListener('pointerup',up); s.el.removeEventListener('pointercancel',up);
+    if(done) return; done=true;
+    s.el.removeEventListener('lostpointercapture',up); s.el.removeEventListener('pointermove',mv); s.el.removeEventListener('pointerup',up); s.el.removeEventListener('pointercancel',up);
     s.el.classList.remove('drag'); PC.drag=null;
     if(performance.now()-s.pt>90){ s.vx=s.vy=0; }
     // gentle fling: scale the throw down and cap its speed
@@ -1026,8 +1029,31 @@ function grab(e,s){
     s.va=Math.max(-2,Math.min(2,s.vx*.003));
     if(s.moved<6 && performance.now()-s.t0<400) fxActivate(s.el);
   };
-  s.el.addEventListener('pointermove',mv); s.el.addEventListener('pointerup',up); s.el.addEventListener('pointercancel',up);
+  s.el.addEventListener('pointermove',mv); s.el.addEventListener('pointerup',up); s.el.addEventListener('pointercancel',up); s.el.addEventListener('lostpointercapture',up);
+  s.release=up;
 }
+/* ---- anti-stuck safeguards: nothing may stay jammed, overlapped, frozen, or become NaN ---- */
+function pcRespawn(s,L,Z){   // move an object to the roomiest free spot in the zone
+  const [ex,ey]=pcExt(s); let best=null;
+  for(let k=0;k<48;k++){
+    const cx=Z.l+ex+Math.random()*Math.max(1,Z.r-Z.l-2*ex), cy=Z.t+ey+Math.random()*Math.max(1,Z.b-Z.t-2*ey);
+    const c={x:cx-s.w/2,y:cy-s.h/2,w:s.w,h:s.h,a:s.rest||0};
+    let clear=1e9, hit=false;
+    for(const o of L){ if(o===s) continue; if(pcHit(c,o,10)) hit=true; clear=Math.min(clear,Math.hypot(cx-(o.x+o.w/2),cy-(o.y+o.h/2))); }
+    const score=(hit?-1e6:0)+clear;
+    if(!best||score>best.score) best={score,x:c.x,y:c.y};
+  }
+  if(best){ s.x=best.x; s.y=best.y; } else { s.x=Z.l+(Z.r-Z.l-s.w)/2; s.y=Z.t+(Z.b-Z.t-s.h)/2; }
+  s.vx=s.vy=s.va=0; s.a=s.rest=(Math.random()-.5)*.14; s.tt=0; s.wx=s.x; s.wy=s.y; s.ot=0;
+}
+function pcUnstick(s,T){   // give a barely-moving object a fresh heading and a push
+  const sd=Math.random()<.5?-1:1;
+  s.tt=0; s.sp=90; s.gl=T+2; s.vx+=sd*(90+Math.random()*60); s.vy+=(Math.random()-.5)*120;
+}
+function pcReleaseDrag(){ if(PC.drag){ const d=PC.drag; if(d.release) d.release(); PC.drag=null; d.el.classList.remove('drag'); } }
+window.addEventListener('blur',pcReleaseDrag);
+document.addEventListener('visibilitychange',()=>{ if(document.hidden) pcReleaseDrag(); PC.last=0; });
+window.addEventListener('pointerup',()=>{ if(PC.drag) setTimeout(()=>{ if(PC.drag) pcReleaseDrag(); },60); },true);
 function stepPC(t){
   PC.raf=requestAnimationFrame(stepPC);
   const st=document.getElementById(FX.stage); if(!st||!st.offsetWidth){PC.last=0;return;}
@@ -1115,6 +1141,17 @@ function stepPC(t){
       }
     }
     clampAll();
+  }
+  if(PC.drag && !PC.drag.el.isConnected) PC.drag=null;
+  for(const s of L){                                                    // watchdog
+    if(!(isFinite(s.x)&&isFinite(s.y)&&isFinite(s.vx)&&isFinite(s.vy)&&isFinite(s.a)&&isFinite(s.va))){ pcRespawn(s,L,Z); continue; }
+    if(s===PC.drag){ s.wx=s.x; s.wy=s.y; s.wt=T; s.ot=0; continue; }
+    if(s.wt===undefined){ s.wx=s.x; s.wy=s.y; s.wt=T; }
+    if(Math.hypot(s.x-s.wx,s.y-s.wy)>14){ s.wx=s.x; s.wy=s.y; s.wt=T; }
+    else if(T-s.wt>2.2){ pcUnstick(s,T); s.wx=s.x; s.wy=s.y; s.wt=T; }   // hardly moved for 2s+: shove it on its way
+    let hit=false; for(const o of L){ if(o!==s&&o!==PC.drag&&pcHit(s,o,0)){ hit=true; break; } }
+    if(hit){ if(!s.ot) s.ot=T; else if(T-s.ot>2){ pcRespawn(s,L,Z); } } else s.ot=0;   // overlapped for 2s+: relocate to free space
+    if(s.x<-50||s.y<-50||s.x>st.clientWidth+50||s.y>st.clientHeight+50) pcRespawn(s,L,Z);   // somehow outside the stage
   }
   for(const s of L){
     const bob=Math.sin(T*1.5+s.ph)*2, wob=Math.sin(T*1.1+s.ph*1.7)*.012;   // light bobble
