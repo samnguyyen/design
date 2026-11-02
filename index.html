@@ -65,6 +65,13 @@
   @media (min-width:1000px){ .contact-viz{display:block;} }
   /* HERO ENVELOPE: flipbook of the open-envelope frames, anchored to the envelope body */
   .hero-env{--ew:min(34vw,46svh,700px); position:absolute; z-index:1; pointer-events:none; width:calc(var(--ew)*1.601); aspect-ratio:1697/1377; left:calc(50% + var(--ew)*.0297); bottom:calc(54px - var(--ew)*.0368); transform:translateX(-50%);}
+  /* PORTRAIT: envelope sits right under the button, overlapping the text block by the same proportion as on wide screens */
+  @media (max-aspect-ratio:1/1){
+    .hero-stage{flex-direction:column; align-items:center; justify-content:flex-start;}
+    #hero-stage{--pew:min(52vw,40svh); height:auto !important; min-height:0; padding-bottom:calc((54px - var(--pew)*.0368)/2 + 64px);}   /* tab stays put: 96px minus the 32px the content moved down */
+    #hero-stage .hero{padding-top:calc(clamp(96px,10vw,156px) + 32px) !important;}   /* text + envelope down half a grid square */   /* hero shrinks to fit: same envelope-to-tab gap as on wide screens */
+    #hero-env{--ew:var(--pew); position:relative; left:calc(var(--ew)*.0297); bottom:auto; transform:none; margin-top:calc(var(--ew)*-.24);}
+  }
   .hero-env canvas{position:absolute; inset:0; width:100%; height:100%; transform-origin:50% 86%; will-change:transform;}
   .hero-env canvas.pop{animation:envPop .17s cubic-bezier(.3,.7,.3,1) both;}
   .hero-env canvas.kick{animation:envKick .18s ease-out both;}
@@ -238,8 +245,7 @@
   .ft-bottom{margin-top:calc(clamp(40px,5vw,72px) + clamp(300px,36vw,500px) + clamp(48px,7vw,88px)); padding-top:22px; border-top:1px solid rgba(247,245,240,.16);}   /* divider line only, no text */
   .ft-stage{position:absolute; inset:0; z-index:5; pointer-events:none;}   /* covers the whole footer; the postcards float above the text and can sit over it */
   .site-footer .pc{box-shadow:0 0 0 1px rgba(255,255,255,.14), 0 10px 26px rgba(0,0,0,.45);}
-  body.on-play .ft-stage{display:none;}   /* the Play page has its own floating objects */
-  .ft-cta{flex:1 1 480px; max-width:1230px;}
+    .ft-cta{flex:1 1 480px; max-width:1230px;}
   .ft-cta h2{font-family:var(--sans); font-size:clamp(51px,8.4vw,114px); font-weight:600; letter-spacing:-0.02em; line-height:1.02;}
   .ft-actions .ft-social{margin-left:auto; margin-top:0; margin-right:2px;}   /* icons sit at the far right of the button row */
   .ft-actions{display:flex; align-items:center; gap:22px; margin-top:34px; flex-wrap:wrap;}
@@ -949,7 +955,13 @@ window.addEventListener('resize', scheduleAlign);
 if(document.fonts&&document.fonts.ready){ document.fonts.ready.then(scheduleAlign); }
 window.addEventListener('load', scheduleAlign);
 const PC={list:[],drag:null,raf:0,last:0};
-const FX={mode:'home',stage:'ft-stage',layer:'pc-layer'};   // which page the floating objects are currently on
+const FX={mode:'home',stage:'ft-stage',layer:'pc-layer'};
+/* two independent float contexts (footer cards + Play objects) share one physics step: swap the active state in and out */
+const CTX={home:{on:false,PC:{list:[],drag:null,pairs:{},last:0},FX:{mode:'home',stage:'ft-stage',layer:'pc-layer'}},
+           play:{on:false,PC:{list:[],drag:null,pairs:{},last:0},FX:{mode:'play',stage:'play-stage',layer:'play-layer'}}};
+let CUR='home';
+function swapCtx(n){ if(n===CUR) return; const c=CTX[CUR]; c.PC={list:PC.list,drag:PC.drag,pairs:PC.pairs,last:PC.last}; c.FX={...FX};
+  const t=CTX[n]; PC.list=t.PC.list; PC.drag=t.PC.drag; PC.pairs=t.PC.pairs; PC.last=t.PC.last; Object.assign(FX,t.FX); CUR=n; }   // which page the floating objects are currently on
 function floorH(){ return document.getElementById(FX.stage).clientHeight; }
 function pcZone(){ // home: the open area beneath the subtext row; play: the whole stage. Always clear of every edge
   const st=document.getElementById(FX.stage), M=26;
@@ -967,7 +979,7 @@ function pcSize(){ // card width follows the space available: more room, bigger 
   const Z=pcZone(), area=(Z.r-Z.l)*Math.max(120,Z.b-Z.t), w=Math.max(play?130:100,Math.min(play?300:240,Math.sqrt(1.5*(play?.2:.3)*area/n)));
   document.getElementById(FX.layer).style.setProperty('--pcw',w.toFixed(0)+'px');
 }
-window.addEventListener('resize',()=>{ if(document.getElementById(FX.stage).offsetWidth) pcSize(); });
+window.addEventListener('resize',()=>{ const keep=CUR; for(const n of ['home','play']){ if(!CTX[n].on) continue; swapCtx(n); if(document.getElementById(FX.stage).offsetWidth) pcSize(); } swapCtx(keep); });
 function pcExt(s){const sn=Math.abs(Math.sin(s.a)),cs=Math.abs(Math.cos(s.a));return [(s.w*cs+s.h*sn)/2,(s.w*sn+s.h*cs)/2];}
 function pcHit(A,B,gap){
   const dx=(A.x+A.w/2)-(B.x+B.w/2), dy=(A.y+A.h/2)-(B.y+B.h/2), ca=Math.cos(A.a), sa=Math.sin(A.a), cb=Math.cos(B.a), sb=Math.sin(B.a);
@@ -984,6 +996,7 @@ const POSTCARD_HTML=(p,i)=>`<div class="pc" role="link" tabindex="0" aria-label=
 function initPostcards(){ initFloat('home'); }
 function fxActivate(el){ if(FX.mode==='play') openPlay(el.dataset.id); else location.hash='#/project/'+el.dataset.id; }   // click on an object
 function initFloat(mode){
+  swapCtx(mode); CTX[mode].on=true;
   FX.mode=mode; FX.stage=mode==='play'?'play-stage':'ft-stage'; FX.layer=mode==='play'?'play-layer':'pc-layer';
   const layer=document.getElementById(FX.layer); pcSize();
   layer.innerHTML = mode==='play'
@@ -994,8 +1007,8 @@ function initFloat(mode){
     const w=el.offsetWidth, h=el.offsetHeight;
     const s={el,slot:i,w,h,vx:(Math.random()-.5)*30,vy:(Math.random()-.5)*20,a:0,va:0,ph:Math.random()*6.28,rest:(Math.random()-.5)*.14};
     s.x=Z.l+(Z.r-Z.l)*((i+.5)/layer.children.length)-w/2; s.y=Z.t+Math.random()*Math.max(0,Z.b-Z.t-h); s.a=s.rest;
-    el.addEventListener('pointerdown',e=>grab(e,s));
-    el.addEventListener('keydown',e=>{ if(e.key==='Enter') fxActivate(el); });
+    el.addEventListener('pointerdown',e=>{ swapCtx(mode); grab(e,s); });
+    el.addEventListener('keydown',e=>{ if(e.key==='Enter'){ swapCtx(mode); fxActivate(el); } });
     return s;
   });
   PC.pairs={}; PC.last=0; if(!PC.raf) PC.raf=requestAnimationFrame(stepPC);
@@ -1054,6 +1067,10 @@ document.addEventListener('visibilitychange',()=>{ if(document.hidden) pcRelease
 window.addEventListener('pointerup',()=>{ if(PC.drag) setTimeout(()=>{ if(PC.drag) pcReleaseDrag(); },60); },true);
 function stepPC(t){
   PC.raf=requestAnimationFrame(stepPC);
+  for(const n of ['home','play']){ if(!CTX[n].on) continue; swapCtx(n); stepOne(t); }
+  const dn=['home','play'].find(n=>CTX[n].on&&(n===CUR?PC.drag:CTX[n].PC.drag)); if(dn) swapCtx(dn);   // leave the dragged context active so its pointer handlers see the right state
+}
+function stepOne(t){
   const st=document.getElementById(FX.stage); if(!st||!st.offsetWidth){PC.last=0;return;}
   const dt=Math.min(.033,PC.last?(t-PC.last)/1000:.016); PC.last=t;
   const L=PC.list, VS=Math.min(1,Math.sqrt(4/L.length)), T=t/1000, FH=floorH(), GAP=FX.mode==='home'?12:5; let TOP=16, HB=FH-14;
@@ -1188,7 +1205,7 @@ function renderRoute(){
     scheduleAlign();
     const hh1=document.querySelector('.hero h1'); if(hh1){ hh1.classList.remove('hop'); void hh1.offsetWidth; hh1.classList.add('hop'); }   // greeting hop: once per home open
   }
-  document.body.classList.toggle('on-play', hash==='#/play'); if(hash!=='#/play') initPostcards();   // the postcards live in the footer, so every page except Play shows them
+  document.body.classList.toggle('on-play', hash==='#/play'); if(hash!=='#/play') CTX.play.on=false; initPostcards();   // footer postcards show on every page, Play included (Play also has its own floating objects)
   closePlay(); window.scrollTo(0,0); SMOOTH.sync(); setHeroH(); sheetFX();
 }
 
